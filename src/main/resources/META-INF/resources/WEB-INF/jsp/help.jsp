@@ -89,7 +89,7 @@
         <div id="main">
               <form>
                  <fieldset class="form-group">
-                    <label for="email"><span>*</span>Email address</label>
+                    <label for="email"><span style="color: red;">*</span>Email address</label>
                     <input type="email" class="form-control" id="email" placeholder="Enter email">
                  </fieldset>
                   <fieldset class="form-group">
@@ -97,7 +97,7 @@
                      <input type="email" class="form-control" id="subject" placeholder="Enter subject">
                  </fieldset>
                   <fieldset class="form-group">
-                      <label for="textArea"><span>*</span>Content</label>
+                      <label for="textArea"><span style="color: red;">*</span>Content</label>
                       <textarea class="form-control" id="textArea" rows="3"></textarea>
                   </fieldset>
                   <button type="button" class="btn btn-sample" onclick="sendEmail()">Submit</button>

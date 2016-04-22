@@ -29,7 +29,7 @@
     </div>
     <div id="description">
         <h1 style="text-align: center; font-style: normal;">Sentiment analisys</h1>
-        <p>Here you can get sentiment analysis of each topic which you are interested in. Just fill the fields below.</p>
+        <p style="text-align: center;">Here you can get sentiment analysis for each topic which you are interested in. Just fill the fields below.</p>
     </div>
     <div id="content">
         <div id="sidebar">
@@ -115,7 +115,7 @@
             <div id="inputFields">
                 <form role="form" class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-sm-6"><label>Input your request</label><input type="text" class="form-control" id="requestText"></div>
+                        <div class="col-sm-6"><label><span style="color: red;">*</span>Input your request</label><input type="text" class="form-control" id="requestText"></div>
                         <div class="col-sm-3"><label>From</label><input type="text" class="form-control" id="calendarFrom"></div>
                         <div class="col-sm-3"><label>To</label><input type="text" class="form-control" id="calendarTo"></div>
                     </div>
@@ -150,7 +150,7 @@
 
 <script>
     var barChart;
-    var ipAddress = jQuery.parseJSON('${jsonIpAddress}');
+    var macAddress = jQuery.parseJSON('${jsonMacAddress}');
 
     $(function(){
         $.datepicker.setDefaults(
@@ -168,7 +168,7 @@
         $.ajax({
             url: '/getSentimentResultByTopicAndDate',
             type: 'POST',
-            data: 'topicAndDate=' + topicAndDate + "&ipAddress=" + ipAddress,
+            data: 'topicAndDate=' + topicAndDate + "&macAddress=" + macAddress,
             success: function (data) {
                 console.log('data =  ' + data);
                 var sentimentResultWithTweets = jQuery.parseJSON(data);
@@ -250,7 +250,7 @@
             $.ajax({
                 url: '/ajaxRequest',
                 type: 'POST',
-                data: 'topic=' + inputText + "&firstDate=" + firstDate + "&lastDate=" + lastDate + "&ipAddress=" + ipAddress,
+                data: 'topic=' + inputText + "&firstDate=" + firstDate + "&lastDate=" + lastDate + "&macAddress=" + macAddress,
                 success: function (data) {
                     console.log('data=' + data);
                     getHistory();
@@ -282,11 +282,11 @@
     }
 
     function getHistory() {
-        console.log('ip= ' + ipAddress);
+        console.log('ip= ' + macAddress);
         $.ajax({
             url: '/ajaxGetHistory',
             type: 'POST',
-            data: 'ipAddress=' + ipAddress,
+            data: 'macAddress=' + macAddress,
             success: function (data) {
                 var listTopicsWithDates = jQuery.parseJSON(data);
 
@@ -307,11 +307,11 @@
     }
 
     function deleteRequestHistory() {
-        console.log('ip= ' + ipAddress);
+        console.log('ip= ' + macAddress);
         $.ajax({
             url: '/delete',
             type: 'POST',
-            data: 'ipAddress=' + ipAddress,
+            data: 'macAddress=' + macAddress,
             success: function (data) {
                 $('#history').html('<table class="table table-hover"></table>');
             },

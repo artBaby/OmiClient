@@ -22,6 +22,10 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,18 +47,34 @@ public class WebController {
 
     @RequestMapping("/")
     public String index(HttpServletRequest request, Model model) {
-        String ipAddress  = request.getRemoteAddr(); //get client Ip Address
-        List<JsonHistory> listTopicsWithDates = history.getTopicsAndDates(ipAddress);
+        StringBuilder macAddress = new StringBuilder();
+        try {
+            InetAddress ip = InetAddress.getLocalHost(); // get ip adress
+            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+
+            byte[] mac = network.getHardwareAddress();
+
+            for (int i = 0; i < mac.length; i++) {
+                macAddress.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+            }
+            System.out.println("Current MAC address : " + macAddress.toString());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (SocketException e){
+            e.printStackTrace();
+        }
+
+        List<JsonHistory> listTopicsWithDates = history.getTopicsAndDates(macAddress.toString());
 
         ObjectMapper mapper = new ObjectMapper();
-        String jsonIpAddress = "";
+        String jsonMacAddress = "";
         try {
-            jsonIpAddress = mapper.writeValueAsString(ipAddress);
+            jsonMacAddress = mapper.writeValueAsString(macAddress);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        model.addAttribute("jsonIpAddress", jsonIpAddress);
+        model.addAttribute("jsonMacAddress", jsonMacAddress);
         model.addAttribute("listTopicsWithDates", listTopicsWithDates);
         return "startPage";
     }
@@ -63,7 +83,7 @@ public class WebController {
     public @ResponseBody String getSentimentResultByTopic(@RequestParam("topic") String topic,
                                                           @RequestParam("firstDate") String firstDate,
                                                           @RequestParam("lastDate") String lastDate,
-                                                          @RequestParam("ipAddress") String ipAddress) throws Exception {
+                                                          @RequestParam("macAddress") String macAddress) throws Exception {
 
         System.out.println("this is from controller: " + topic + "  " +firstDate + "  " + lastDate);
         List<JsonSentimentResult> jsonSentimentResultWithTweets = new ArrayList<>();
@@ -93,7 +113,7 @@ public class WebController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        history.saveHistoryOfRequest(ipAddress, topic, jsonSentimentResultWithTweets);  //save history of the request to MongoDB collection 'history'
+        history.saveHistoryOfRequest(macAddress, topic, jsonSentimentResultWithTweets);  //save history of the request to MongoDB collection 'history'
 
         return json;
     }
@@ -103,8 +123,8 @@ public class WebController {
     }
 
     @RequestMapping(value = "/ajaxGetHistory", method = RequestMethod.POST)
-    public @ResponseBody String getHistory(@RequestParam("ipAddress") String ipAddress){
-        List<JsonHistory> listTopicsWithDate = history.getTopicsAndDates(ipAddress);
+    public @ResponseBody String getHistory(@RequestParam("macAddress") String macAddress){
+        List<JsonHistory> listTopicsWithDate = history.getTopicsAndDates(macAddress);
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonListTopicsWithDate = "";
@@ -117,14 +137,14 @@ public class WebController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public @ResponseBody String deleteRequestHistory(@RequestParam("ipAddress") String ipAddress){
-        history.deleteHistory(ipAddress);
+    public @ResponseBody String deleteRequestHistory(@RequestParam("macAddress") String macAddress){
+        history.deleteHistory(macAddress);
         String str = "";
         return str;
     }
 
     @RequestMapping(value = "/getSentimentResultByTopicAndDate", method = RequestMethod.POST)
-    public @ResponseBody String getSentimentResultFromHistory(@RequestParam("topicAndDate") String topicAndDate, @RequestParam("ipAddress") String ipAddress){
+    public @ResponseBody String getSentimentResultFromHistory(@RequestParam("topicAndDate") String topicAndDate, @RequestParam("macAddress") String macAddress){
         String[] strings = topicAndDate.split("-");
         String topic = strings[0].trim();
         Long date = 0L;
@@ -135,7 +155,7 @@ public class WebController {
             e.printStackTrace();
         }
 
-        List<JsonSentimentResult> sentimentResultWithTweets = history.getSentimentResultByTopicAndDate(ipAddress, topic, date);
+        List<JsonSentimentResult> sentimentResultWithTweets = history.getSentimentResultByTopicAndDate(macAddress, topic, date);
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonSentimentResultWithTweets = "";
