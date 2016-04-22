@@ -162,6 +162,7 @@
     });
 
     function getTopicAndDateByLink(value) {
+        $('#message').empty();
         var topicAndDate = value.innerHTML;
         var activeTab = 'tab1';
         console.log('topicAndDate= ' + topicAndDate);
@@ -257,6 +258,14 @@
                     var sentimentResultWithTweets = jQuery.parseJSON(data);
                     var sentimentResults = sentimentResultWithTweets.map( sentimentResultTweet => sentimentResultTweet.sentimentResult);
                     var numberOfTweets = sentimentResultWithTweets.map( sentimentResultTweet => sentimentResultTweet.numberOfTweets);
+
+                    var positiveArr = numberOfTweets.filter(function(number) {
+                        return number != 0;
+                    });
+
+                    if(positiveArr.length == 0)
+                        $('#message').html('<h4 style="color: red">Posts on this request not found.</h4>');
+
                     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                         activeTab = $(e.target).attr('id');
                         if (activeTab == 'tab1') {
