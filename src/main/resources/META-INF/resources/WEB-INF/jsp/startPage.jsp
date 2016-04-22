@@ -12,6 +12,7 @@
     <script src='${pageContext.request.contextPath}/javascript/Chart.js'></script>
     <script src="${pageContext.request.contextPath}/javascript/jquery-1.12.2.js"></script>
     <script src="${pageContext.request.contextPath}/javascript/jquery-ui.js"></script>
+    <script src="${pageContext.request.contextPath}/javascript/jquery-ui.min.js"></script>
     <script src="${pageContext.request.contextPath}/javascript/bootstrap.min.js"></script>
 
 
@@ -158,7 +159,6 @@
         );
         $("#calendarFrom").datepicker({dateFormat:'yy-mm-dd'});
         $("#calendarTo").datepicker({dateFormat:'yy-mm-dd'});
-        
     });
 
     function getTopicAndDateByLink(value) {
