@@ -29,7 +29,7 @@ public class MongoDao {
     private final MongoCollection<Document> accounts = db.getCollection("accounts");
     private final MongoCollection<Document> tweets = db.getCollection("tweets");
 
-
+    private MongoDao(){}
 
 
     public static MongoDao getInstance(){
